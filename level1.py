@@ -72,7 +72,7 @@ last_idx = wafer_size[0] - 1
 for j in range(0, frame_size[0]):
     for k in range(0, frame_size[1]):
         if(abs(wafer[0, j, k] - wafer[1, j, k]) > 4 and abs(wafer[0, j, k] - wafer[2, j, k]) > 4):
-            anamoly.add((1, j, k ))
+            anamoly.add((1, k,frame_size[0] - 1 - j))
         if(abs(wafer[last_idx, j, k] - wafer[last_idx-1, j, k]) > 2 and abs(wafer[last_idx, j, k] - wafer[last_idx-2, j, k]) > 2):
             anamoly.add((last_idx + 1, k, frame_size[0] - 1 - j))
 
