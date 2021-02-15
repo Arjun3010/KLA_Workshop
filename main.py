@@ -117,14 +117,14 @@ for careArea in careAreaList:
             if(abs(dieList[0].img[i, j] - die[2].img[i, j]]) > 4 and abs(dieList[1].img[i, j] - die[0].img[i, j]]) > 4)
                     anamoly.add(dieList[0].id,die_size[0] - 1 - i, j)
             if(abs(dieList[len(dieList)-1].img[i, j] - die[len(dieList)-2].img[i, j]]) > 4 and abs(dieList[len(dieList)-1].img[i, j] - die[len(dieList)-3].img[i, j]]) > 4)
-                    anamoly.add(dieList[len(dieList)-1].id,die_size[0] - 1 - i, j)
+                    anamoly.add(dieList[len(dieList)-1].id, j ,die_size[0] - 1 - i)
 
 #Comparing first and last frame with 2 frames consecutively
 for i in range(1, wafer_size[0]-1):
     for j in range(0, frame_size[0]):
         for k in range(0, frame_size[1]):
             if(abs(wafer[i, j, k] - wafer[i-1, j, k]) > 4 and abs(wafer[i, j, k] - wafer[i+1, j, k]) > 4):
-                anamoly.add((i+1, j, k))
+                anamoly.add((i+1, k, die_size[0] - 1 - j))
 
 
 l = list(anamoly)
