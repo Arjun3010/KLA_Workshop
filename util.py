@@ -1,3 +1,8 @@
+import json
+import os 
+import cv2
+import numpy as np
+
 def load_input(_path : str):
     with open(_path) as json_file:
         data = json.load(json_file)
@@ -5,10 +10,20 @@ def load_input(_path : str):
 
 def get_number_images(_path : str):
     cwd = os.getcwd() + '\\' + _path
-    entries = listdir(cwd)
-    return entries - 1
+    entries = os.listdir(cwd)
+    return len(entries) - 1
 
-def load_input(_path : str):
-    with open(_path) as json_file:
-        data = json.load(json_file)
-    return data
+def load_image(_path : str):
+    img = cv2.imread(_path, 0)
+    return img
+
+def get_average(pixels):
+    std_dev = np.std(pixels)
+    mean_value = np.mean(pixels)
+    anamoly_cutoff = std_dev * 3
+    lower = mean_value - anamoly_cutoff
+    upper = mean_value + anamoly_cutoff
+    return (lower, upper)
+
+def check_anomalies(curr, lower, upper):
+    return curr > upper or curr < lower
