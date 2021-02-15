@@ -11,27 +11,70 @@ class CareArea:
         self.xmax = _xmax
         self.ymin = _ymin
         self.ymax = _ymax
-
-class Frame:
-    number_of_frames = 0
-    def __init__(self, _img):
-        Frame.number += 1
-        self.id = Frame.number_of_frames + 1
-        self.image = _img
-        self.size = self.image.shape
-# class Anamoly:
-#     def __init__(self, id, row, col):
-#         self.id = id
-#         self.row = row
-#         self.col = col
-
-#     def calculate_anamoly(height, row, col, die_size, frame_size, street_size):
-#         r = height*frame_size[0] + 
-class Wafer:
-    def __init__(self):
-        self.data = None
     
-    #def form_wafer(self, frame_list):
+    def isIn(self, x, y):
+        if(self.xmin <= x and self.xmax >= x and self.ymin <= y and self.ymax >= y):
+            return True
+        return False
+
+class ExclusionZone:
+    def __init__(self, _xmin, _xmax, _ymin, _ymax):
+        self.xmin = _xmin
+        self.xmax = _xmax
+        self.ymin = _ymin
+        self.ymax = _ymax
+    
+    def isNotIn(self, x, y):
+        if(self.xmin <= x and self.xmax >= x and self.ymin <= y and self.ymax >= y):
+            return False
+        return True
+
+class Wafer:
+    def __init__(self, _path, size):
+        wafer = []
+        for i in range(size[0]):
+            for j in range(size[1]):
+                coord = 0
+                if i%2 == 0:
+                    coord = i*size[1] + j + 1
+                else:
+                    coord = i*size[1] + size[0] - j 
+                image_path = f'Level_1_data/wafer_image_{coord}.png'
+                img = load_image(image_path)
+                wafer.append(img)
+        self.matrix = np.array(wafer)
+        self.matrix.share = size
+        self.size = size
+
+#Load initial inputs
+data = load_input('Level_1_data/input.json')
+
+
+careAreaList = []
+for area in range(data["care_areas"]):
+    corn1 = area["top_left"]
+    corn2 = area["bottom_right"]
+    careAreaList.append(CareArea(corn1["x"], corn2["x"], corn1["y"], corn2["y"]))
+
+exclusionZonesList = []
+for area in range(data["exclusion_zones"]):
+    corn1 = area["top_left"]
+    corn2 = area["bottom_right"]
+    exclusionZonesList.append(CareArea(corn1["x"], corn2["x"], corn1["y"], corn2["y"]))
+
+dieList = []
+
+class Die:
+    def __init__(self, img, id):
+        self.id = id
+        self.img = img
+    
+    
+class Anamoly:
+    def __init__(self, id, row, col):
+        self.id = id
+        self.row = row
+        self.col = col
 
 i = 1
 #Load input data
@@ -45,31 +88,39 @@ die_size = (data["die"]["width"], data["die"]["height"])
 dimension_of_wafer = (data["die"]["width"]*data["die"]["columns"] + data["street_width"] * (data["die"]["columns"] - 1)
                         , data["die"]["height"]*data["die"]["rows"] + data["street_width"] * (data["die"]["rows"] - 1))
 print(dimension_of_wafer)
-Wafer_frame_dimn = (dimension_of_wafer[0]/dimension_of_frame[0], dimension_of_wafer[1]/dimension_of_frame[1])
+Wafer_frame_dimn = (dimension_of_wafer[0]//dimension_of_frame[0], dimension_of_wafer[1]//dimension_of_frame[1])
 
 #Number of images in the file
 number_of_image = get_number_images('Level_1_data')
-
-#Main dataanamolys
-frame_list = []
-
-#Standard dev
-std_dev = []
-
-#Mean 
-mean_value = []
 
 #Anamoly
 anamoly = set()
 
 #wafer
-wafer = load_image(f'Level_1_data/wafer_image_1.png')
+wafer = []
 print(wafer)
-wafer = np.reshape(wafer, (1, dimension_of_frame[0], dimension_of_frame[1]))
 print("\n\n\n",wafer)
+
+n = Wafer_frame_dimn
+for i in range(n[0]):
+    for j in range(n[1]):
+        coord = 0
+        if i%2 == 0:
+            coord = i*n[1] + j + 1
+        else:
+            coord = i*n[1] + n[0] - j 
+        path_ = f'Level_1_data/wafer_image_{coord}.png'
+        img = load_image(f'Level_1_data/wafer_image_{i}.png')
+        wafer.append(img)
+    
+wafer = np.array(wafer)
+wafer.shape = (n[0], n[1])
+
+
+
+
 for i in range(2, number_of_image+1):
     img = load_image(f'Level_1_data/wafer_image_{i}.png')
-    img = np.reshape(img, (1, dimension_of_frame[0], dimension_of_frame[1]))
     wafer = np.append(wafer, img, axis=0)
 
 wafer_size = wafer.shape
