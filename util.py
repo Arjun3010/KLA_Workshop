@@ -16,14 +16,3 @@ def get_number_images(_path : str):
 def load_image(_path : str):
     img = cv2.imread(_path, 0)
     return img
-
-# def get_average(pixels):
-#     std_dev = np.std(pixels)
-#     mean_value = np.mean(pixels)
-#     anamoly_cutoff = std_dev * 3
-#     lower = mean_value - anamoly_cutoff
-#     upper = mean_value + anamoly_cutoff
-#     return (lower, upper)
-
-# def check_anomalies(curr, lower, upper):
-#     return curr > upper or curr < lower

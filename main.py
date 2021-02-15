@@ -46,6 +46,18 @@ class Wafer:
         self.matrix.share = size
         self.size = size
 
+class Die:
+    def __init__(self, img, id):
+        self.id = id
+        self.img = img
+    
+    
+class Anamoly:
+    def __init__(self, id, row, col):
+        self.id = id
+        self.row = row
+        self.col = col
+
 #Load initial inputs
 data = load_input('Level_1_data/input.json')
 
@@ -63,25 +75,11 @@ for area in range(data["exclusion_zones"]):
     exclusionZonesList.append(CareArea(corn1["x"], corn2["x"], corn1["y"], corn2["y"]))
 
 dieList = []
+# Code to form the die from the given wafer here 
 
-class Die:
-    def __init__(self, img, id):
-        self.id = id
-        self.img = img
-    
-    
-class Anamoly:
-    def __init__(self, id, row, col):
-        self.id = id
-        self.row = row
-        self.col = col
-
-i = 1
 #Load input data
 data = load_input('Level_1_data/input.json')
 dimension_of_frame = load_image(f'Level_1_data/wafer_image_1.png').shape
-
-print(dimension_of_frame)
 
 #Dimension of Wafer
 die_size = (data["die"]["width"], data["die"]["height"])
@@ -97,26 +95,9 @@ number_of_image = get_number_images('Level_1_data')
 anamoly = set()
 
 #wafer
-wafer = []
+wafer = Wafer('Level_1_data', Wafer_frame_dimn)
 print(wafer)
 print("\n\n\n",wafer)
-
-n = Wafer_frame_dimn
-for i in range(n[0]):
-    for j in range(n[1]):
-        coord = 0
-        if i%2 == 0:
-            coord = i*n[1] + j + 1
-        else:
-            coord = i*n[1] + n[0] - j 
-        path_ = f'Level_1_data/wafer_image_{coord}.png'
-        img = load_image(f'Level_1_data/wafer_image_{i}.png')
-        wafer.append(img)
-    
-wafer = np.array(wafer)
-wafer.shape = (n[0], n[1])
-
-
 
 
 for i in range(2, number_of_image+1):
@@ -129,17 +110,16 @@ street_size = data["street_width"]
 
 print(wafer_size, frame_size)
 
+#Comparing first and last frame with 2 frames consecutively
+for careArea in careAreaList:
+    for i in range(xmin, xmax+1):
+        for j in range(ymin, ymax+1):
+            if(abs(dieList[0].img[i, j] - die[2].img[i, j]]) > 4 and abs(dieList[1].img[i, j] - die[0].img[i, j]]) > 4)
+                    anamoly.add(dieList[0].id,die_size[0] - 1 - i, j)
+            if(abs(dieList[len(dieList)-1].img[i, j] - die[len(dieList)-2].img[i, j]]) > 4 and abs(dieList[len(dieList)-1].img[i, j] - die[len(dieList)-3].img[i, j]]) > 4)
+                    anamoly.add(dieList[len(dieList)-1].id,die_size[0] - 1 - i, j)
 
 #Comparing first and last frame with 2 frames consecutively
-last_idx = wafer_size[0] - 1
-for j in range(0, frame_size[0]):
-        for k in range(0, frame_size[1]):
-            if(abs(wafer[0, j, k] - wafer[1, j, k]) > 4 and abs(wafer[0, j, k] - wafer[2, j, k]) > 4):
-                anamoly.add((1, j, k ))
-            if(abs(wafer[last_idx, j, k] - wafer[last_idx-1, j, k]) > 4 and abs(wafer[last_idx, j, k] - wafer[last_idx-2, j, k]) > 4):
-                anamoly.add((last_idx + 1, j, k))
-
-#Comparing before and previous frame
 for i in range(1, wafer_size[0]-1):
     for j in range(0, frame_size[0]):
         for k in range(0, frame_size[1]):
@@ -147,13 +127,7 @@ for i in range(1, wafer_size[0]-1):
                 anamoly.add((i+1, j, k))
 
 
-print(anamoly)
-
-
-
-# # for i in frame_list:
-# #     inst = Die(i.img)
-# #     die_list.append(inst)
-
-# # for i in frame_list:
-# #     wafle = np.concatenate
+l = list(anamoly)
+df = pd.DataFrame.from_records(l)
+df.to_csv('output.csv', header=False, index=False)
+print(df)

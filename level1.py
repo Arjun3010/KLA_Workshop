@@ -50,23 +50,11 @@ Wafer_frame_dimn = (dimension_of_wafer[0]/dimension_of_frame[0], dimension_of_wa
 #Number of images in the file
 number_of_image = get_number_images('Level_1_data')
 
-#Main dataanamolys
-frame_list = []
-
-#Standard dev
-std_dev = []
-
-#Mean 
-mean_value = []
-
-#Anamoly
 anamoly = set()
 
 #wafer
 wafer = load_image(f'Level_1_data/wafer_image_1.png')
-print(wafer)
 wafer = np.reshape(wafer, (1, dimension_of_frame[0], dimension_of_frame[1]))
-print("\n\n\n",wafer)
 for i in range(2, number_of_image+1):
     img = load_image(f'Level_1_data/wafer_image_{i}.png')
     img = np.reshape(img, (1, dimension_of_frame[0], dimension_of_frame[1]))
@@ -79,25 +67,21 @@ die_size = (data["die"]["height"], data["die"]["width"])
 
 print(wafer_size, frame_size)
 
-for j in range(0, die_size[0]):
-    for k in 
-
-
 #Comparing first and last frame with 2 frames consecutively
 last_idx = wafer_size[0] - 1
 for j in range(0, frame_size[0]):
     for k in range(0, frame_size[1]):
         if(abs(wafer[0, j, k] - wafer[1, j, k]) > 4 and abs(wafer[0, j, k] - wafer[2, j, k]) > 4):
             anamoly.add((1, j, k ))
-        if(abs(wafer[last_idx, j, k] - wafer[last_idx-1, j, k]) > 4 and abs(wafer[last_idx, j, k] - wafer[last_idx-2, j, k]) > 4):
-            anamoly.add((last_idx + 1,frame_size[0] - 1 - j, k))
+        if(abs(wafer[last_idx, j, k] - wafer[last_idx-1, j, k]) > 2 and abs(wafer[last_idx, j, k] - wafer[last_idx-2, j, k]) > 2):
+            anamoly.add((last_idx + 1, k, frame_size[0] - 1 - j))
 
 #Comparing before and previous frame
 for i in range(1, wafer_size[0]-1):
     for j in range(0, frame_size[0]):
         for k in range(0, frame_size[1]):
             if(abs(wafer[i, j, k] - wafer[i-1, j, k]) > 4 and abs(wafer[i, j, k] - wafer[i+1, j, k]) > 4):
-                anamoly.add((i+1,frame_size[0] - 1 - j, k))
+                anamoly.add((i+1, k, frame_size[0] - 1 - j))
 
 l = list(anamoly)
 df = pd.DataFrame.from_records(l)
